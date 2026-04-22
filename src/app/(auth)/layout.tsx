@@ -40,16 +40,12 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
           <div className="flex items-center gap-2">
             <ModeToggle />
             <Button variant={'outline'} asChild>
-              <Link href={isSignInPage ? '/sign-up' : '/sign-in'}>
-                {isSignInPage ? 'Sign Up' : 'Sign In'}
-              </Link>
+              <Link href={isSignInPage ? '/sign-up' : '/sign-in'}>{isSignInPage ? 'Sign Up' : 'Sign In'}</Link>
             </Button>
           </div>
         </nav>
 
-        <div className="flex flex-col items-center justify-center pt-4 md:pt-14">
-          {children}
-        </div>
+        <div className="flex flex-col items-center justify-center pt-4 md:pt-14">{children}</div>
       </div>
     </main>
   );

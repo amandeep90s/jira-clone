@@ -4,77 +4,22 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import * as z from 'zod';
 
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from '@/components/ui/field';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from '@/components/ui/input-group';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
-
-const formSchema = z
-  .object({
-    name: z
-      .string()
-      .trim()
-      .min(1, { message: 'Name is required' })
-      .max(50, { message: 'Name must be less than 50 characters' }),
-    email: z
-      .email({ message: 'Invalid email address' })
-      .trim()
-      .min(1, { message: 'Email is required' })
-      .max(50, { message: 'Email must be less than 50 characters' }),
-    password: z
-      .string()
-      .trim()
-      .min(8, { message: 'Password must be at least 8 characters' })
-      .max(50, { message: 'Password must be less than 50 characters' })
-      .regex(/[A-Z]/, {
-        message: 'Password must contain at least one uppercase letter',
-      })
-      .regex(/[a-z]/, {
-        message: 'Password must contain at least one lowercase letter',
-      })
-      .regex(/[0-9]/, { message: 'Password must contain at least one number' })
-      .regex(/[@$!%*?&]/, {
-        message: 'Password must contain at least one special character',
-      })
-      .refine((value) => !/\s/.test(value), {
-        message: 'Password must not contain spaces',
-      }),
-    confirmPassword: z
-      .string()
-      .min(8, { message: 'Confirm Password must be at least 8 characters' }),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'Passwords do not match',
-    path: ['confirmPassword'],
-  });
+import { SignUpData, signUpSchema } from '@/features/auth/schemas';
 
 export const SignUpCard = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<SignUpData>({
+    resolver: zodResolver(signUpSchema),
     mode: 'onChange',
     defaultValues: {
       name: '',
@@ -84,16 +29,14 @@ export const SignUpCard = () => {
     },
   });
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
+  function onSubmit(data: SignUpData) {
     console.log('Form submitted:', data);
   }
 
   return (
     <Card className="h-full w-full md:w-md">
       <CardHeader className="flex flex-col items-center justify-center text-center">
-        <CardTitle className="text-2xl font-semibold">
-          Create an Account
-        </CardTitle>
+        <CardTitle className="text-2xl font-semibold">Create an Account</CardTitle>
         <CardDescription>
           By sigining up, you agree to our{' '}
           <Link href="/terms" className="text-primary hover:underline">
@@ -112,11 +55,7 @@ export const SignUpCard = () => {
       </div>
 
       <CardContent className="px-7">
-        <form
-          id="sign-up-form"
-          className="space-y-4"
-          onSubmit={form.handleSubmit(onSubmit)}
-        >
+        <form id="sign-up-form" className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup>
             <Controller
               name="name"
@@ -133,9 +72,7 @@ export const SignUpCard = () => {
                     autoComplete="off"
                     disabled={form.formState.isSubmitting}
                   />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -155,9 +92,7 @@ export const SignUpCard = () => {
                     autoComplete="off"
                     disabled={form.formState.isSubmitting}
                   />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -182,22 +117,14 @@ export const SignUpCard = () => {
                       <button
                         type="button"
                         onClick={() => setShowPassword((prev) => !prev)}
-                        aria-label={
-                          showPassword ? 'Hide password' : 'Show password'
-                        }
+                        aria-label={showPassword ? 'Hide password' : 'Show password'}
                         className="text-muted-foreground hover:text-foreground focus:outline-none"
                       >
-                        {showPassword ? (
-                          <EyeIcon size={16} />
-                        ) : (
-                          <EyeOffIcon size={16} />
-                        )}
+                        {showPassword ? <EyeIcon size={16} /> : <EyeOffIcon size={16} />}
                       </button>
                     </InputGroupAddon>
                   </InputGroup>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -207,9 +134,7 @@ export const SignUpCard = () => {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="confirmPassword">
-                    Confirm Password
-                  </FieldLabel>
+                  <FieldLabel htmlFor="confirmPassword">Confirm Password</FieldLabel>
                   <InputGroup>
                     <InputGroupInput
                       {...field}
@@ -224,24 +149,14 @@ export const SignUpCard = () => {
                       <button
                         type="button"
                         onClick={() => setShowConfirmPassword((prev) => !prev)}
-                        aria-label={
-                          showConfirmPassword
-                            ? 'Hide password'
-                            : 'Show password'
-                        }
+                        aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
                         className="text-muted-foreground hover:text-foreground focus:outline-none"
                       >
-                        {showConfirmPassword ? (
-                          <EyeIcon size={16} />
-                        ) : (
-                          <EyeOffIcon size={16} />
-                        )}
+                        {showConfirmPassword ? <EyeIcon size={16} /> : <EyeOffIcon size={16} />}
                       </button>
                     </InputGroupAddon>
                   </InputGroup>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -251,14 +166,8 @@ export const SignUpCard = () => {
 
       <CardFooter className="flex-col">
         <Field orientation="responsive">
-          <Button
-            type="submit"
-            form="sign-up-form"
-            disabled={form.formState.isSubmitting}
-          >
-            {form.formState.isSubmitting && (
-              <Spinner data-icon="inline-start" />
-            )}
+          <Button type="submit" form="sign-up-form" disabled={form.formState.isSubmitting}>
+            {form.formState.isSubmitting && <Spinner data-icon="inline-start" />}
 
             {form.formState.isSubmitting ? 'Signing Up...' : 'Sign Up'}
           </Button>

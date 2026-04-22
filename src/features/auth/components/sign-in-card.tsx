@@ -4,48 +4,21 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import * as z from 'zod';
 
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from '@/components/ui/field';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from '@/components/ui/input-group';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
-
-const formSchema = z.object({
-  email: z
-    .email({ message: 'Invalid email address' })
-    .trim()
-    .min(1, { message: 'Email is required' })
-    .max(50, { message: 'Email must be less than 50 characters' }),
-  password: z
-    .string()
-    .min(1, { message: 'Password is required' })
-    .max(50, { message: 'Password must be less than 50 characters' }),
-});
+import { type SignInData, signInSchema } from '@/features/auth/schemas';
 
 export const SignInCard = () => {
   const [showPassword, setShowPassword] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<SignInData>({
+    resolver: zodResolver(signInSchema),
     mode: 'onChange',
     defaultValues: {
       email: '',
@@ -53,7 +26,7 @@ export const SignInCard = () => {
     },
   });
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
+  function onSubmit(data: SignInData) {
     console.log('Form submitted:', data);
   }
 
@@ -68,11 +41,7 @@ export const SignInCard = () => {
       </div>
 
       <CardContent className="px-7">
-        <form
-          id="sign-in-form"
-          className="space-y-4"
-          onSubmit={form.handleSubmit(onSubmit)}
-        >
+        <form id="sign-in-form" className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup>
             <Controller
               name="email"
@@ -89,9 +58,7 @@ export const SignInCard = () => {
                     autoComplete="off"
                     disabled={form.formState.isSubmitting}
                   />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -116,22 +83,14 @@ export const SignInCard = () => {
                       <button
                         type="button"
                         onClick={() => setShowPassword((prev) => !prev)}
-                        aria-label={
-                          showPassword ? 'Hide password' : 'Show password'
-                        }
+                        aria-label={showPassword ? 'Hide password' : 'Show password'}
                         className="text-muted-foreground hover:text-foreground focus:outline-none"
                       >
-                        {showPassword ? (
-                          <EyeIcon size={16} />
-                        ) : (
-                          <EyeOffIcon size={16} />
-                        )}
+                        {showPassword ? <EyeIcon size={16} /> : <EyeOffIcon size={16} />}
                       </button>
                     </InputGroupAddon>
                   </InputGroup>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -141,14 +100,8 @@ export const SignInCard = () => {
 
       <CardFooter className="flex-col">
         <Field orientation="responsive">
-          <Button
-            type="submit"
-            form="sign-in-form"
-            disabled={form.formState.isSubmitting}
-          >
-            {form.formState.isSubmitting && (
-              <Spinner data-icon="inline-start" />
-            )}
+          <Button type="submit" form="sign-in-form" disabled={form.formState.isSubmitting}>
+            {form.formState.isSubmitting && <Spinner data-icon="inline-start" />}
 
             {form.formState.isSubmitting ? 'Signing In...' : 'Sign In'}
           </Button>
