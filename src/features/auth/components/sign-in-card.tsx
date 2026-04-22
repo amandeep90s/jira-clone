@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Controller, useForm } from 'react-hook-form';
 import * as z from 'zod';
 
@@ -24,6 +25,7 @@ import { Spinner } from '@/components/ui/spinner';
 const formSchema = z.object({
   email: z
     .email({ message: 'Invalid email address' })
+    .trim()
     .min(1, { message: 'Email is required' })
     .max(50, { message: 'Email must be less than 50 characters' }),
   password: z
@@ -35,6 +37,7 @@ const formSchema = z.object({
 export const SignInCard = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    mode: 'onChange',
     defaultValues: {
       email: '',
       password: '',
@@ -48,7 +51,7 @@ export const SignInCard = () => {
   return (
     <Card className="h-full w-full md:w-md">
       <CardHeader className="flex items-center justify-center">
-        <CardTitle className="text-2xl">Welcome Back!</CardTitle>
+        <CardTitle className="text-2xl font-semibold">Welcome Back!</CardTitle>
       </CardHeader>
 
       <div className="px-7">
@@ -109,7 +112,7 @@ export const SignInCard = () => {
         </form>
       </CardContent>
 
-      <CardFooter>
+      <CardFooter className="flex-col">
         <Field orientation="responsive">
           <Button
             type="submit"
@@ -134,6 +137,13 @@ export const SignInCard = () => {
             Sign In with GitHub
           </Button>
         </Field>
+
+        <p className="mt-5">
+          Don&apos;t have an account?{' '}
+          <Link href="/sign-up" className="text-primary hover:underline">
+            Sign Up
+          </Link>
+        </p>
       </CardFooter>
     </Card>
   );
