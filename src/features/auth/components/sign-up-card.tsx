@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,9 +15,12 @@ import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
 import { SignUpFormData, signUpSchema } from '@/features/auth/schemas';
 
+import { useSignUp } from '../api/use-sign-up';
+
 export const SignUpCard = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { mutate, isPending } = useSignUp();
 
   const form = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema),
@@ -30,7 +34,16 @@ export const SignUpCard = () => {
   });
 
   function onSubmit(data: SignUpFormData) {
-    console.log('Form submitted:', data);
+    mutate(
+      { json: data },
+      {
+        onSuccess: () => {
+          form.reset();
+          toast.success('Successfully signed up!');
+        },
+        onError: () => toast.error('Failed to sign up. Please check your details and try again.'),
+      },
+    );
   }
 
   return (
@@ -70,7 +83,7 @@ export const SignUpCard = () => {
                     aria-invalid={fieldState.invalid}
                     placeholder="Enter your name"
                     autoComplete="off"
-                    disabled={form.formState.isSubmitting}
+                    disabled={form.formState.isSubmitting || isPending}
                   />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
@@ -90,7 +103,7 @@ export const SignUpCard = () => {
                     aria-invalid={fieldState.invalid}
                     placeholder="Enter your email"
                     autoComplete="off"
-                    disabled={form.formState.isSubmitting}
+                    disabled={form.formState.isSubmitting || isPending}
                   />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
@@ -111,7 +124,7 @@ export const SignUpCard = () => {
                       aria-invalid={fieldState.invalid}
                       placeholder="Enter your password"
                       autoComplete="off"
-                      disabled={form.formState.isSubmitting}
+                      disabled={form.formState.isSubmitting || isPending}
                     />
                     <InputGroupAddon align="inline-end">
                       <button
@@ -143,7 +156,7 @@ export const SignUpCard = () => {
                       aria-invalid={fieldState.invalid}
                       placeholder="Confirm your password"
                       autoComplete="off"
-                      disabled={form.formState.isSubmitting}
+                      disabled={form.formState.isSubmitting || isPending}
                     />
                     <InputGroupAddon align="inline-end">
                       <button
@@ -166,7 +179,7 @@ export const SignUpCard = () => {
 
       <CardFooter className="flex-col">
         <Field orientation="responsive">
-          <Button type="submit" form="sign-up-form" disabled={form.formState.isSubmitting}>
+          <Button type="submit" form="sign-up-form" disabled={form.formState.isSubmitting || isPending}>
             {form.formState.isSubmitting && <Spinner data-icon="inline-start" />}
 
             {form.formState.isSubmitting ? 'Signing Up...' : 'Sign Up'}
