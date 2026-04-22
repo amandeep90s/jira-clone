@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,12 +13,14 @@ import { Input } from '@/components/ui/input';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
-import { type SignInData, signInSchema } from '@/features/auth/schemas';
+import { useSignIn } from '@/features/auth/api/use-sign-in';
+import { type SignInFormData, signInSchema } from '@/features/auth/schemas';
 
 export const SignInCard = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const { mutate, isPending } = useSignIn();
 
-  const form = useForm<SignInData>({
+  const form = useForm<SignInFormData>({
     resolver: zodResolver(signInSchema),
     mode: 'onChange',
     defaultValues: {
@@ -26,8 +29,17 @@ export const SignInCard = () => {
     },
   });
 
-  function onSubmit(data: SignInData) {
-    console.log('Form submitted:', data);
+  function onSubmit(formData: SignInFormData) {
+    mutate(
+      { json: formData },
+      {
+        onSuccess: () => {
+          form.reset();
+          toast.success('Successfully signed in!');
+        },
+        onError: () => toast.error('Failed to sign in. Please check your credentials and try again.'),
+      },
+    );
   }
 
   return (
@@ -56,7 +68,7 @@ export const SignInCard = () => {
                     aria-invalid={fieldState.invalid}
                     placeholder="Enter your email"
                     autoComplete="off"
-                    disabled={form.formState.isSubmitting}
+                    disabled={form.formState.isSubmitting || isPending}
                   />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
@@ -77,7 +89,7 @@ export const SignInCard = () => {
                       aria-invalid={fieldState.invalid}
                       placeholder="Enter your password"
                       autoComplete="off"
-                      disabled={form.formState.isSubmitting}
+                      disabled={form.formState.isSubmitting || isPending}
                     />
                     <InputGroupAddon align="inline-end">
                       <button
@@ -100,7 +112,7 @@ export const SignInCard = () => {
 
       <CardFooter className="flex-col">
         <Field orientation="responsive">
-          <Button type="submit" form="sign-in-form" disabled={form.formState.isSubmitting}>
+          <Button type="submit" form="sign-in-form" disabled={form.formState.isSubmitting || isPending}>
             {form.formState.isSubmitting && <Spinner data-icon="inline-start" />}
 
             {form.formState.isSubmitting ? 'Signing In...' : 'Sign In'}

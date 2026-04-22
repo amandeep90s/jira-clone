@@ -12,13 +12,13 @@ import { Input } from '@/components/ui/input';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
-import { SignUpData, signUpSchema } from '@/features/auth/schemas';
+import { SignUpFormData, signUpSchema } from '@/features/auth/schemas';
 
 export const SignUpCard = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const form = useForm<SignUpData>({
+  const form = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema),
     mode: 'onChange',
     defaultValues: {
@@ -29,7 +29,7 @@ export const SignUpCard = () => {
     },
   });
 
-  function onSubmit(data: SignUpData) {
+  function onSubmit(data: SignUpFormData) {
     console.log('Form submitted:', data);
   }
 

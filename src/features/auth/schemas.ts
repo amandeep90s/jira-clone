@@ -50,5 +50,5 @@ export const signUpSchema = z
   });
 
 // Export the inferred TypeScript type for the sign-in data
-export type SignInData = z.infer<typeof signInSchema>;
-export type SignUpData = z.infer<typeof signUpSchema>;
+export type SignInFormData = z.infer<typeof signInSchema>;
+export type SignUpFormData = z.infer<typeof signUpSchema>;
