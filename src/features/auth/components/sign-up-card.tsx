@@ -1,6 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { EyeIcon, EyeOffIcon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import * as z from 'zod';
 
@@ -20,6 +22,11 @@ import {
   FieldLabel,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from '@/components/ui/input-group';
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
 
@@ -63,6 +70,9 @@ const formSchema = z
   });
 
 export const SignUpCard = () => {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     mode: 'onChange',
@@ -158,15 +168,33 @@ export const SignUpCard = () => {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <Input
-                    {...field}
-                    type="password"
-                    id={field.name}
-                    aria-invalid={fieldState.invalid}
-                    placeholder="Enter your password"
-                    autoComplete="off"
-                    disabled={form.formState.isSubmitting}
-                  />
+                  <InputGroup>
+                    <InputGroupInput
+                      {...field}
+                      type={showPassword ? 'text' : 'password'}
+                      id={field.name}
+                      aria-invalid={fieldState.invalid}
+                      placeholder="Enter your password"
+                      autoComplete="off"
+                      disabled={form.formState.isSubmitting}
+                    />
+                    <InputGroupAddon align="inline-end">
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((prev) => !prev)}
+                        aria-label={
+                          showPassword ? 'Hide password' : 'Show password'
+                        }
+                        className="text-muted-foreground hover:text-foreground focus:outline-none"
+                      >
+                        {showPassword ? (
+                          <EyeIcon size={16} />
+                        ) : (
+                          <EyeOffIcon size={16} />
+                        )}
+                      </button>
+                    </InputGroupAddon>
+                  </InputGroup>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
@@ -182,15 +210,35 @@ export const SignUpCard = () => {
                   <FieldLabel htmlFor="confirmPassword">
                     Confirm Password
                   </FieldLabel>
-                  <Input
-                    {...field}
-                    type="password"
-                    id={field.name}
-                    aria-invalid={fieldState.invalid}
-                    placeholder="Confirm your password"
-                    autoComplete="off"
-                    disabled={form.formState.isSubmitting}
-                  />
+                  <InputGroup>
+                    <InputGroupInput
+                      {...field}
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      id={field.name}
+                      aria-invalid={fieldState.invalid}
+                      placeholder="Confirm your password"
+                      autoComplete="off"
+                      disabled={form.formState.isSubmitting}
+                    />
+                    <InputGroupAddon align="inline-end">
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword((prev) => !prev)}
+                        aria-label={
+                          showConfirmPassword
+                            ? 'Hide password'
+                            : 'Show password'
+                        }
+                        className="text-muted-foreground hover:text-foreground focus:outline-none"
+                      >
+                        {showConfirmPassword ? (
+                          <EyeIcon size={16} />
+                        ) : (
+                          <EyeOffIcon size={16} />
+                        )}
+                      </button>
+                    </InputGroupAddon>
+                  </InputGroup>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
