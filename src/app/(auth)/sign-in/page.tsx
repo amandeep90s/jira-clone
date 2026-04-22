@@ -1,5 +1,7 @@
-import React from 'react';
+'use client';
+
+import { SignInCard } from '@/features/auth/components/sign-in-card';
 
 export default function SignIn() {
-  return <div>SignIn</div>;
+  return <SignInCard />;
 }
