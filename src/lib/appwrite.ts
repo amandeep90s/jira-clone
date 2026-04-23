@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { Account, Client, Databases, Storage, Users } from 'node-appwrite';
+import { Account, Client } from 'node-appwrite';
 
 export async function createAdminClient() {
   const client = new Client()
