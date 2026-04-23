@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -18,13 +19,14 @@ import { SignUpFormData, signUpSchema } from '@/features/auth/schemas';
 import { useSignUp } from '../api/use-sign-up';
 
 export const SignUpCard = () => {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { mutate, isPending } = useSignUp();
 
   const form = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema),
-    mode: 'onChange',
+    mode: 'onSubmit',
     defaultValues: {
       name: '',
       email: '',
@@ -39,6 +41,7 @@ export const SignUpCard = () => {
       {
         onSuccess: () => {
           form.reset();
+          router.replace('/');
           toast.success('Successfully signed up!');
         },
         onError: () => toast.error('Failed to sign up. Please check your details and try again.'),

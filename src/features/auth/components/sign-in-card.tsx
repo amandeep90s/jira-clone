@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -17,12 +18,13 @@ import { useSignIn } from '@/features/auth/api/use-sign-in';
 import { type SignInFormData, signInSchema } from '@/features/auth/schemas';
 
 export const SignInCard = () => {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const { mutate, isPending } = useSignIn();
 
   const form = useForm<SignInFormData>({
     resolver: zodResolver(signInSchema),
-    mode: 'onChange',
+    mode: 'onSubmit',
     defaultValues: {
       email: '',
       password: '',
@@ -35,6 +37,7 @@ export const SignInCard = () => {
       {
         onSuccess: () => {
           form.reset();
+          router.replace('/');
           toast.success('Successfully signed in!');
         },
         onError: () => toast.error('Failed to sign in. Please check your credentials and try again.'),
