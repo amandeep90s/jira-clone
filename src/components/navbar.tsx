@@ -1,6 +1,7 @@
 import { UserButton } from '@/features/auth/components/user-button';
 
 import { MobileSidebar } from './mobile-sidebar';
+import { ModeToggle } from './ui/mode-toggle';
 
 export function Navbar() {
   return (
@@ -11,7 +12,10 @@ export function Navbar() {
       </div>
 
       <MobileSidebar />
-      <UserButton />
+      <div className="flex items-center gap-2">
+        <ModeToggle />
+        <UserButton />
+      </div>
     </nav>
   );
 }

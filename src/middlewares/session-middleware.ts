@@ -14,6 +14,7 @@ import {
   type Users as UsersType,
 } from 'node-appwrite';
 
+import { APPWRITE_ENDPOINT, APPWRITE_PROJECT } from '@/config';
 import { AUTH_COOKIE_NAME } from '@/features/auth/constants';
 
 type AdditionalContext = {
@@ -27,9 +28,7 @@ type AdditionalContext = {
 };
 
 export const sessionMiddleware = createMiddleware<AdditionalContext>(async (c, next) => {
-  const client = new Client()
-    .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
-    .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT!);
+  const client = new Client().setEndpoint(APPWRITE_ENDPOINT).setProject(APPWRITE_PROJECT);
 
   const session = getCookie(c, AUTH_COOKIE_NAME);
 
