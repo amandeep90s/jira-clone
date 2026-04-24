@@ -1,3 +1,5 @@
+'use client';
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { InferResponseType } from 'hono';
 import { useRouter } from 'next/navigation';
@@ -22,7 +24,7 @@ export const useSignOut = () => {
     },
     onSuccess: () => {
       queryClient.removeQueries({ queryKey: ['current-user'] });
-      router.replace('/sign-in');
+      router.refresh();
     },
   });
 
