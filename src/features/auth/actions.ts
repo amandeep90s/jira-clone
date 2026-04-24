@@ -17,8 +17,7 @@ const getRequiredEnv = (name: 'NEXT_PUBLIC_APPWRITE_ENDPOINT' | 'NEXT_PUBLIC_APP
 
 /**
  * Get the currently authenticated user.
- * @returns The authenticated user or null if not authenticated.
- * @throws If there is an error fetching the user information, then null is returned.
+ * @returns The authenticated user, or null if not authenticated or if fetching the user information fails.
  */
 export const getUser = async () => {
   const endpoint = getRequiredEnv('NEXT_PUBLIC_APPWRITE_ENDPOINT');
