@@ -1,3 +1,5 @@
+'use client';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
 import Image from 'next/image';
@@ -19,7 +21,6 @@ import { SignUpFormData, signUpSchema } from '@/features/auth/schemas';
 import { useSignUp } from '../api/use-sign-up';
 
 export const SignUpCard = () => {
-  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { mutate, isPending } = useSignUp();
@@ -41,7 +42,6 @@ export const SignUpCard = () => {
       {
         onSuccess: () => {
           form.reset();
-          router.replace('/');
           toast.success('Successfully signed up!');
         },
         onError: () => toast.error('Failed to sign up. Please check your details and try again.'),
