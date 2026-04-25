@@ -11,6 +11,8 @@ import {
   Models,
   Storage,
   type Storage as StorageType,
+  TablesDB,
+  type TablesDB as TablesDBType,
   type Users as UsersType,
 } from 'node-appwrite';
 
@@ -22,6 +24,7 @@ type AdditionalContext = {
     account: AccountType;
     databases: DatabasesType;
     storage: StorageType;
+    tablesDB: TablesDBType;
     users: UsersType;
     user: Models.User<Models.Preferences>;
   };
@@ -41,6 +44,7 @@ export const sessionMiddleware = createMiddleware<AdditionalContext>(async (c, n
   const account = new Account(client);
   const databases = new Databases(client);
   const storage = new Storage(client);
+  const tablesDB = new TablesDB(client);
 
   let user: Models.User<Models.Preferences>;
 
@@ -53,6 +57,7 @@ export const sessionMiddleware = createMiddleware<AdditionalContext>(async (c, n
   c.set('account', account as AccountType);
   c.set('databases', databases as DatabasesType);
   c.set('storage', storage as StorageType);
+  c.set('tablesDB', tablesDB as TablesDBType);
   c.set('user', user);
 
   await next();
