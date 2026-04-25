@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { InferResponseType } from 'hono';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 import { client } from '@/lib/rpc';
 
@@ -23,6 +24,7 @@ export const useSignOut = () => {
       return response.json();
     },
     onSuccess: () => {
+      toast.success('Successfully signed out!');
       queryClient.removeQueries({ queryKey: ['current-user'] });
       router.refresh();
     },
