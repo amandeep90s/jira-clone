@@ -21,6 +21,11 @@ export const useSignOut = () => {
   const mutation = useMutation<ResponseType, Error>({
     mutationFn: async () => {
       const response = await client.api.auth['sign-out'].$post();
+
+      if (!response.ok) {
+        throw new Error('Failed to sign out. Please try again.');
+      }
+
       return response.json();
     },
     onSuccess: () => {
