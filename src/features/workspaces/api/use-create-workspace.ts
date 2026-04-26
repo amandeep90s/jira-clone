@@ -1,26 +1,26 @@
 'use client';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { InferRequestType, InferResponseType } from 'hono';
+import { InferResponseType } from 'hono';
 
 import { client } from '@/lib/rpc';
 
+import { CreateWorkspaceFormData } from '../schemas';
+
 type ResponseType = InferResponseType<typeof client.api.workspaces.$post>;
 
-type RequestType = InferRequestType<typeof client.api.workspaces.$post>;
-
-/**
- * Custom hook to handle workspace creation using React Query's useMutation.
- * It sends a POST request to the workspace creation endpoint and returns the response.
- * @returns An object containing the mutation function and its state (loading, error, data).
- * On successful workspace creation, it invalidates the 'workspaces' query to refresh the workspace list.
- */
 export const useCreateWorkspace = () => {
   const queryClient = useQueryClient();
 
-  const mutation = useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ json }) => {
-      const response = await client.api.workspaces.$post({ json });
+  const mutation = useMutation<ResponseType, Error, CreateWorkspaceFormData>({
+    mutationFn: async (data) => {
+      const response = await client.api.workspaces.$post({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        form: {
+          name: data.name,
+          ...(data.image instanceof File ? { image: data.image } : {}),
+        } as any,
+      });
 
       if (!response.ok) {
         throw new Error('Failed to create workspace. Please try again.');
