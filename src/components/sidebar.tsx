@@ -9,6 +9,7 @@ import { useSignOut } from '@/features/auth/api/use-sign-out';
 import { Navigation } from './navigation';
 import { Button } from './ui/button';
 import { Separator } from './ui/separator';
+import WorkspaceSwitcher from './workspace-switcher';
 
 export function Sidebar() {
   const { mutate: signOut } = useSignOut();
@@ -35,6 +36,10 @@ export function Sidebar() {
               loading="eager"
             />
           </Link>
+
+          <Separator className="my-4" />
+
+          <WorkspaceSwitcher />
 
           <Separator className="my-4" />
 

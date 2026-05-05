@@ -15,10 +15,10 @@ export const useCreateWorkspace = () => {
   const mutation = useMutation<ResponseType, Error, CreateWorkspaceFormData>({
     mutationFn: async (data) => {
       const response = await client.api.workspaces.$post({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         form: {
           name: data.name,
           ...(data.image instanceof File ? { image: data.image } : {}),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any,
       });
 

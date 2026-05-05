@@ -7,36 +7,47 @@ import { sessionMiddleware } from '@/middlewares/session-middleware';
 
 import { createWorkspaceSchema } from '../schemas';
 
-const app = new Hono().post('/', zValidator('form', createWorkspaceSchema), sessionMiddleware, async (c) => {
-  const tablesDB = c.get('tablesDB');
-  const user = c.get('user');
-  const storage = c.get('storage');
+const app = new Hono()
+  .get('/', sessionMiddleware, async (c) => {
+    const tablesDB = c.get('tablesDB');
 
-  const { name, image } = c.req.valid('form');
+    const workspaces = await tablesDB.listRows({
+      databaseId: DATABASE_ID,
+      tableId: WORKSPACES_TABLE_ID,
+    });
 
-  let uploadedImageUrl: string | undefined;
+    return c.json({ data: workspaces });
+  })
+  .post('/', zValidator('form', createWorkspaceSchema), sessionMiddleware, async (c) => {
+    const tablesDB = c.get('tablesDB');
+    const user = c.get('user');
+    const storage = c.get('storage');
 
-  if (image instanceof File) {
-    const file = await storage.createFile({ bucketId: STORAGE_BUCKET_ID, fileId: ID.unique(), file: image });
+    const { name, image } = c.req.valid('form');
 
-    const arrayBuffer = await storage.getFileDownload({ bucketId: STORAGE_BUCKET_ID, fileId: file.$id });
+    let uploadedImageUrl: string | undefined;
 
-    uploadedImageUrl = `data:image/png;base64,${Buffer.from(arrayBuffer).toString('base64')}`;
-  }
+    if (image instanceof File) {
+      const file = await storage.createFile({ bucketId: STORAGE_BUCKET_ID, fileId: ID.unique(), file: image });
 
-  const workspace = await tablesDB.createRow({
-    databaseId: DATABASE_ID,
-    tableId: WORKSPACES_TABLE_ID,
-    rowId: ID.unique(),
-    data: { name, userId: user.$id, imageUrl: uploadedImageUrl },
-    permissions: [
-      Permission.read(Role.user(user.$id)),
-      Permission.update(Role.user(user.$id)),
-      Permission.delete(Role.user(user.$id)),
-    ],
+      const arrayBuffer = await storage.getFileDownload({ bucketId: STORAGE_BUCKET_ID, fileId: file.$id });
+
+      uploadedImageUrl = `data:image/png;base64,${Buffer.from(arrayBuffer).toString('base64')}`;
+    }
+
+    const workspace = await tablesDB.createRow({
+      databaseId: DATABASE_ID,
+      tableId: WORKSPACES_TABLE_ID,
+      rowId: ID.unique(),
+      data: { name, userId: user.$id, imageUrl: uploadedImageUrl },
+      permissions: [
+        Permission.read(Role.user(user.$id)),
+        Permission.update(Role.user(user.$id)),
+        Permission.delete(Role.user(user.$id)),
+      ],
+    });
+
+    return c.json({ data: workspace });
   });
-
-  return c.json({ data: workspace });
-});
 
 export default app;
