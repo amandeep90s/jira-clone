@@ -31,6 +31,7 @@ export const useSignOut = () => {
     onSuccess: () => {
       toast.success('Successfully signed out!');
       queryClient.removeQueries({ queryKey: ['current-user'] });
+      queryClient.removeQueries({ queryKey: ['workspaces'] });
       router.refresh();
     },
   });

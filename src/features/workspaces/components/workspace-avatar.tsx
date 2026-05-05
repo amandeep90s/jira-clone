@@ -20,7 +20,7 @@ export default function WorkspaceAvatar({ image, name, className }: WorkspaceAva
 
   return (
     <Avatar className={cn('size-10 rounded-md', className)}>
-      <AvatarFallback className="text-foreground bg-primary rounded-md text-sm font-semibold uppercase">
+      <AvatarFallback className="text-foreground rounded-md text-sm font-semibold uppercase">
         {name[0]}
       </AvatarFallback>
     </Avatar>
