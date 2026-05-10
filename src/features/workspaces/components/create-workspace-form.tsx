@@ -17,6 +17,7 @@ import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
 import { useCreateWorkspace } from '@/features/workspaces/api/use-create-workspace';
 import { CreateWorkspaceFormData, createWorkspaceSchema } from '@/features/workspaces/schemas';
+import { cn } from '@/lib/utils';
 
 interface CreateWorkspaceFormProps {
   onCancel?: () => void;
@@ -171,6 +172,7 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
             variant={'outline'}
             onClick={handleCancel}
             disabled={form.formState.isSubmitting || isPending}
+            className={cn(Boolean(onCancel) ? 'block' : 'hidden')}
           >
             Cancel
           </Button>
