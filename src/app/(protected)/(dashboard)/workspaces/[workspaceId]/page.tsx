@@ -1,8 +1,5 @@
-import React from 'react'
+import React from 'react';
 
 export default function WorkspaceDetail() {
-
-  return (
-    <div>WorkspaceDetailPage</div>
-  )
+  return <div>WorkspaceDetailPage</div>;
 }

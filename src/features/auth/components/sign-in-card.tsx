@@ -118,9 +118,9 @@ export const SignInCard = () => {
       <CardFooter className="flex-col">
         <Field orientation="responsive">
           <Button type="submit" form="sign-in-form" disabled={form.formState.isSubmitting || isPending}>
-            {form.formState.isSubmitting && <Spinner data-icon="inline-start" />}
+            {(form.formState.isSubmitting || isPending) && <Spinner data-icon="inline-start" />}
 
-            {form.formState.isSubmitting ? 'Signing In...' : 'Sign In'}
+            {form.formState.isSubmitting || isPending ? 'Signing In...' : 'Sign In'}
           </Button>
 
           <Separator className="my-3" />

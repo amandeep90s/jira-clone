@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Navbar } from '@/components/navbar';
 import { Sidebar } from '@/components/sidebar';
+import { CreateWorkspaceModal } from '@/features/workspaces/components/create-workspace-modal';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -15,12 +16,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <Sidebar />
         </div>
         <div className="w-full lg:pl-70">
-          <div className="container mx-auto h-full">
+          <div className="h-full w-full">
             <Navbar />
             <main className="flex h-full flex-col px-6 py-8">{children}</main>
           </div>
         </div>
       </div>
+
+      <CreateWorkspaceModal />
     </div>
   );
 }

@@ -17,12 +17,14 @@ import { Spinner } from '@/components/ui/spinner';
 import { CreateWorkspaceFormData, createWorkspaceSchema } from '@/features/workspaces/schemas';
 
 import { useCreateWorkspace } from '../api/use-create-workspace';
+import { useCreateWorkspaceModal } from '../hooks/use-create-workspace-modal';
 
 interface CreateWorkspaceFormProps {
   onCancel?: () => void;
 }
 
 export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
+  const { close } = useCreateWorkspaceModal();
   const { mutate, isPending } = useCreateWorkspace();
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [fileInputKey, setFileInputKey] = useState(0);
@@ -51,6 +53,7 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
     (formData: CreateWorkspaceFormData) => {
       mutate(formData, {
         onSuccess: () => {
+          close();
           form.reset();
           resetImageInput();
           toast.success('Workspace created successfully!');
@@ -58,7 +61,7 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
         onError: () => toast.error('Failed to create workspace. Please try again.'),
       });
     },
-    [form, mutate],
+    [close, form, mutate],
   );
 
   function handleCancel() {
