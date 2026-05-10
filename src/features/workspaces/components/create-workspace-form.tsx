@@ -14,17 +14,14 @@ import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/c
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
+import { useCreateWorkspace } from '@/features/workspaces/api/use-create-workspace';
 import { CreateWorkspaceFormData, createWorkspaceSchema } from '@/features/workspaces/schemas';
-
-import { useCreateWorkspace } from '../api/use-create-workspace';
-import { useCreateWorkspaceModal } from '../hooks/use-create-workspace-modal';
 
 interface CreateWorkspaceFormProps {
   onCancel?: () => void;
 }
 
 export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
-  const { close } = useCreateWorkspaceModal();
   const { mutate, isPending } = useCreateWorkspace();
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [fileInputKey, setFileInputKey] = useState(0);
@@ -49,28 +46,24 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
     setFileInputKey((k) => k + 1);
   }
 
+  const handleCancel = useCallback(() => {
+    form.reset();
+    resetImageInput();
+    if (onCancel) onCancel();
+  }, [onCancel, form]);
+
   const onSubmit = useCallback(
     (formData: CreateWorkspaceFormData) => {
       mutate(formData, {
         onSuccess: () => {
-          close();
-          form.reset();
-          resetImageInput();
+          handleCancel();
           toast.success('Workspace created successfully!');
         },
         onError: () => toast.error('Failed to create workspace. Please try again.'),
       });
     },
-    [close, form, mutate],
+    [handleCancel, mutate],
   );
-
-  function handleCancel() {
-    form.reset();
-    resetImageInput();
-    if (onCancel) {
-      onCancel();
-    }
-  }
 
   function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
