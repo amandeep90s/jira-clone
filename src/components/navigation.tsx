@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import React from 'react';
 import { GoCheckCircle, GoCheckCircleFill } from 'react-icons/go';
 
+import { useWorkspaceId } from '@/features/workspaces/hooks/use-workspace-id';
 import { cn } from '@/lib/utils';
 
 type RoutesType = {
@@ -17,7 +18,7 @@ type RoutesType = {
 
 const routes: RoutesType[] = [
   {
-    label: 'Dashboard',
+    label: 'Home',
     href: '/',
     icon: HomeIcon,
     activeIcon: HomeIcon,
@@ -44,15 +45,17 @@ const routes: RoutesType[] = [
 
 export function Navigation() {
   const pathname = usePathname();
+  const workspaceId = useWorkspaceId();
 
   return (
     <div className="flex flex-col gap-1">
       {routes.map((route) => {
-        const isActive = pathname === route.href;
+        const fullHref = `/workspaces/${workspaceId}${route.href}`;
+        const isActive = pathname === fullHref;
         const Icon = isActive ? route.activeIcon : route.icon;
 
         return (
-          <Link key={route.href} href={route.href}>
+          <Link key={route.href} href={fullHref}>
             <div
               className={cn(
                 'flex cursor-pointer items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium',
