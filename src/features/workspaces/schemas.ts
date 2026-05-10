@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const createWorkspaceSchema = z.object({
+const schema = z.object({
   name: z
     .string()
     .trim()
@@ -14,5 +14,10 @@ export const createWorkspaceSchema = z.object({
     .optional(),
 });
 
+export const createWorkspaceSchema = schema;
+
+export const updateWorkspaceSchema = schema.partial();
+
 // Export the inferred TypeScript type for the create workspace data
 export type CreateWorkspaceFormData = z.infer<typeof createWorkspaceSchema>;
+export type UpdateWorkspaceFormData = z.infer<typeof updateWorkspaceSchema>;

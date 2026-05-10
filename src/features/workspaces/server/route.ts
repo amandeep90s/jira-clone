@@ -4,10 +4,11 @@ import { ID, Permission, Query, Role } from 'node-appwrite';
 
 import { DATABASE_ID, MEMBERS_TABLE_ID, STORAGE_BUCKET_ID, WORKSPACES_TABLE_ID } from '@/config';
 import { MemberRole } from '@/features/members/types';
+import { getMember } from '@/features/members/utils';
 import { generateInviteCode } from '@/lib/utils';
 import { sessionMiddleware } from '@/middlewares/session-middleware';
 
-import { createWorkspaceSchema } from '../schemas';
+import { createWorkspaceSchema, updateWorkspaceSchema } from '../schemas';
 
 const app = new Hono()
   .get('/', sessionMiddleware, async (c) => {
@@ -73,6 +74,45 @@ const app = new Hono()
     });
 
     return c.json({ data: workspace });
+  })
+  .patch('/:workspaceId', zValidator('form', updateWorkspaceSchema), sessionMiddleware, async (c) => {
+    const tablesDB = c.get('tablesDB');
+    const user = c.get('user');
+    const storage = c.get('storage');
+
+    const { workspaceId } = c.req.param();
+    const { name, image } = c.req.valid('form');
+
+    const member = await getMember({ tablesDB, userId: user.$id, workspaceId });
+
+    if (!member) {
+      return c.json({ error: 'Workspace not found' }, 404);
+    }
+
+    if (member.role !== MemberRole.ADMIN) {
+      return c.json({ error: 'Only admins can update the workspace' }, 403);
+    }
+
+    let uploadedImageUrl: string | undefined;
+
+    if (image instanceof File) {
+      const file = await storage.createFile({ bucketId: STORAGE_BUCKET_ID, fileId: ID.unique(), file: image });
+
+      const arrayBuffer = await storage.getFileDownload({ bucketId: STORAGE_BUCKET_ID, fileId: file.$id });
+
+      uploadedImageUrl = `data:image/png;base64,${Buffer.from(arrayBuffer).toString('base64')}`;
+    } else {
+      uploadedImageUrl = image;
+    }
+
+    const updatedWorkspace = await tablesDB.updateRow({
+      databaseId: DATABASE_ID,
+      tableId: WORKSPACES_TABLE_ID,
+      rowId: workspaceId,
+      data: { name, imageUrl: uploadedImageUrl },
+    });
+
+    return c.json({ data: updatedWorkspace });
   });
 
 export default app;
