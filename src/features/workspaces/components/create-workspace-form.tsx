@@ -3,6 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ImageIcon } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -22,6 +23,7 @@ interface CreateWorkspaceFormProps {
 }
 
 export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
+  const router = useRouter();
   const { mutate, isPending } = useCreateWorkspace();
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [fileInputKey, setFileInputKey] = useState(0);
@@ -55,14 +57,14 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
   const onSubmit = useCallback(
     (formData: CreateWorkspaceFormData) => {
       mutate(formData, {
-        onSuccess: () => {
-          handleCancel();
+        onSuccess: ({ data }) => {
+          router.push(`/workspaces/${data.$id}`);
           toast.success('Workspace created successfully!');
         },
         onError: () => toast.error('Failed to create workspace. Please try again.'),
       });
     },
-    [handleCancel, mutate],
+    [mutate, router],
   );
 
   function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
