@@ -246,11 +246,12 @@ export const EditWorkspaceForm = ({ initialValues, onCancel }: EditWorkspaceForm
             <Button
               className="ml-auto w-fit"
               variant="destructive"
-              disabled={isPending}
+              disabled={isPending || isDeleting}
               type="button"
               onClick={handleDelete}
             >
-              Delete Workspace
+              {isDeleting && <Spinner data-icon="inline-start" />}
+              {isDeleting ? 'Deleting...' : 'Delete Workspace'}
             </Button>
           </div>
         </CardContent>
