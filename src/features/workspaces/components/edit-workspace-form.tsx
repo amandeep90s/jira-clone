@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ImageIcon } from 'lucide-react';
+import { ArrowLeftIcon, ImageIcon, Trash2Icon } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -27,8 +27,9 @@ interface EditWorkspaceFormProps {
 
 export const EditWorkspaceForm = ({ initialValues, onCancel }: EditWorkspaceFormProps) => {
   const router = useRouter();
+  console.log(initialValues);
   const { mutate, isPending } = useUpdateWorkspace();
-  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(initialValues.imageUrl ?? null);
   const [fileInputKey, setFileInputKey] = useState(0);
 
   // Revoke the blob URL whenever the preview URL changes or on unmount
@@ -60,7 +61,7 @@ export const EditWorkspaceForm = ({ initialValues, onCancel }: EditWorkspaceForm
 
   const onSubmit = useCallback(
     (formData: UpdateWorkspaceFormData) => {
-      const finalValues = { ...formData, image: formData.image instanceof File ? formData.image : undefined };
+      const finalValues = { ...formData, image: formData.image instanceof File ? formData.image : '' };
       mutate(
         { form: finalValues, workspaceId: initialValues.$id },
         {
@@ -88,7 +89,15 @@ export const EditWorkspaceForm = ({ initialValues, onCancel }: EditWorkspaceForm
 
   return (
     <Card className="h-full w-full">
-      <CardHeader className="flex">
+      <CardHeader className="flex flex-row items-center space-y-0 gap-x-4">
+        <Button
+          size="sm"
+          variant={'secondary'}
+          onClick={onCancel ? onCancel : () => router.push(`/workspaces/${initialValues.$id}`)}
+        >
+          <ArrowLeftIcon size={5} />
+          Back
+        </Button>
         <CardTitle className="text-xl font-bold">Edit {initialValues.name}</CardTitle>
       </CardHeader>
 
@@ -145,10 +154,21 @@ export const EditWorkspaceForm = ({ initialValues, onCancel }: EditWorkspaceForm
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
 
                   {imagePreviewUrl ? (
-                    <div className="w-fit">
-                      <div className="relative size-18 overflow-hidden rounded-md">
+                    <div className="flex w-fit flex-row items-end gap-4">
+                      <div className="relative size-18 overflow-hidden rounded-md border border-neutral-200">
                         <Image src={imagePreviewUrl} alt="Workspace Image" fill className="object-cover" />
                       </div>
+                      <Button
+                        size={'sm'}
+                        title="Remove Image"
+                        onClick={() => {
+                          field.onChange(undefined);
+                          resetImageInput();
+                        }}
+                        variant={'destructive'}
+                      >
+                        <Trash2Icon />
+                      </Button>
                     </div>
                   ) : (
                     <div className="w-fit">
@@ -169,9 +189,9 @@ export const EditWorkspaceForm = ({ initialValues, onCancel }: EditWorkspaceForm
       <CardFooter className="flex-col">
         <Field orientation="horizontal" className="justify-end gap-2">
           <Button type="submit" form="create-workspace-form" disabled={form.formState.isSubmitting || isPending}>
-            {form.formState.isSubmitting && <Spinner data-icon="inline-start" />}
+            {(form.formState.isSubmitting || isPending) && <Spinner data-icon="inline-start" />}
 
-            {form.formState.isSubmitting ? 'Saving...' : 'Save Changes'}
+            {form.formState.isSubmitting || isPending ? 'Saving...' : 'Save Changes'}
           </Button>
 
           <Button
