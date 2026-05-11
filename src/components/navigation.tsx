@@ -19,7 +19,7 @@ type RoutesType = {
 const routes: RoutesType[] = [
   {
     label: 'Home',
-    href: '/',
+    href: '',
     icon: HomeIcon,
     activeIcon: HomeIcon,
   },

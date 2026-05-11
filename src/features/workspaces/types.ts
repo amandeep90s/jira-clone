@@ -5,4 +5,7 @@ export type Workspace = Models.Document & {
   userId: string;
   imageUrl: string;
   inviteCode: string;
+  $id: string;
+  $createdAt: string;
+  $updatedAt: string;
 };

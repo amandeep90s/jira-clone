@@ -6,6 +6,6 @@ export default async function WorkspaceDetail() {
   const user = await getUser();
 
   if (!user) redirect('/sign-in');
-  
+
   return <div>WorkspaceDetailPage</div>;
 }
