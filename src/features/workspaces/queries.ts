@@ -1,46 +1,25 @@
 import 'server-only';
 
-import { cookies } from 'next/headers';
-import { Account, Client, Query, TablesDB } from 'node-appwrite';
+import { Query } from 'node-appwrite';
 
 import { DATABASE_ID, MEMBERS_TABLE_ID, WORKSPACES_TABLE_ID } from '@/config';
-import { AUTH_COOKIE } from '@/features/auth/constants';
 import { getMember } from '@/features/members/utils';
-
-import { Workspace } from './types';
-
-const getRequiredEnv = (name: 'NEXT_PUBLIC_APPWRITE_ENDPOINT' | 'NEXT_PUBLIC_APPWRITE_PROJECT') => {
-  const value = process.env[name];
-
-  if (!value) {
-    throw new Error(`Missing required environment variable: ${name}`);
-  }
-
-  return value;
-};
+import { Workspace } from '@/features/workspaces/types';
+import { createSessionClient } from '@/lib/appwrite';
 
 /**
  * Get the currently authenticated user.
  * @returns The authenticated user, or null if not authenticated or if fetching the user information fails.
  */
 export const getWorkspaces = async () => {
-  const endpoint = getRequiredEnv('NEXT_PUBLIC_APPWRITE_ENDPOINT');
-  const project = getRequiredEnv('NEXT_PUBLIC_APPWRITE_PROJECT');
   const emptyResponse = { total: 0, rows: [] };
 
   try {
-    const client = new Client().setEndpoint(endpoint).setProject(project);
-    const session = (await cookies()).get(AUTH_COOKIE);
+    const session = await createSessionClient();
+    if (!session) return null;
 
-    if (!session) {
-      return emptyResponse;
-    }
-
-    client.setSession(session.value);
-
-    const tablesDB = new TablesDB(client);
-    const account = new Account(client);
-    const user = await account.get();
+    const tablesDB = session.tables;
+    const user = await session.account.get();
 
     const members = await tablesDB.listRows({
       databaseId: DATABASE_ID,
@@ -76,23 +55,14 @@ interface GetWorkspaceProps {
  * @returns The workspace if the user is a member, or an empty response if not.
  */
 export const getWorkspace = async ({ workspaceId }: GetWorkspaceProps): Promise<Workspace | null> => {
-  const endpoint = getRequiredEnv('NEXT_PUBLIC_APPWRITE_ENDPOINT');
-  const project = getRequiredEnv('NEXT_PUBLIC_APPWRITE_PROJECT');
   const emptyResponse = null;
 
   try {
-    const client = new Client().setEndpoint(endpoint).setProject(project);
-    const session = (await cookies()).get(AUTH_COOKIE);
+    const session = await createSessionClient();
+    if (!session) return null;
 
-    if (!session) {
-      return emptyResponse;
-    }
-
-    client.setSession(session.value);
-
-    const tablesDB = new TablesDB(client);
-    const account = new Account(client);
-    const user = await account.get();
+    const tablesDB = session.tables;
+    const user = await session.account.get();
 
     const member = await getMember({ tablesDB, userId: user.$id, workspaceId });
 
@@ -100,13 +70,13 @@ export const getWorkspace = async ({ workspaceId }: GetWorkspaceProps): Promise<
       return emptyResponse;
     }
 
-    const workspace = await tablesDB.getRow({
+    const workspace = await tablesDB.listRows({
       databaseId: DATABASE_ID,
       tableId: WORKSPACES_TABLE_ID,
-      rowId: workspaceId,
+      queries: [Query.equal('$id', workspaceId)],
     });
 
-    return JSON.parse(JSON.stringify(workspace)) as Workspace;
+    return JSON.parse(JSON.stringify(workspace.rows[0])) as Workspace;
   } catch {
     return emptyResponse;
   }

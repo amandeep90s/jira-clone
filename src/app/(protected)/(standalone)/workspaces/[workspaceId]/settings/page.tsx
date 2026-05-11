@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 
 import { getUser } from '@/features/auth/queries';
-import { getWorkspace } from '@/features/workspaces/actions';
+import { getWorkspace } from '@/features/workspaces/queries';
 import { EditWorkspaceForm } from '@/features/workspaces/components/edit-workspace-form';
 
 interface WorkspaceSettingsProps {
