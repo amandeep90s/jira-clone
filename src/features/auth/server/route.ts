@@ -7,7 +7,7 @@ import { signInSchema, signUpSchema } from '@/features/auth/schemas';
 import { createAdminClient } from '@/lib/appwrite';
 import { sessionMiddleware } from '@/middlewares/session-middleware';
 
-import { AUTH_COOKIE_NAME } from '../constants';
+import { AUTH_COOKIE } from '../constants';
 
 const app = new Hono()
   .get('/me', sessionMiddleware, async (c) => {
@@ -22,7 +22,7 @@ const app = new Hono()
 
     const session = await account.createEmailPasswordSession({ email, password });
 
-    setCookie(c, AUTH_COOKIE_NAME, session.secret, {
+    setCookie(c, AUTH_COOKIE, session.secret, {
       path: '/',
       httpOnly: true,
       secure: true,
@@ -46,7 +46,7 @@ const app = new Hono()
 
     const session = await account.createEmailPasswordSession({ email, password });
 
-    setCookie(c, AUTH_COOKIE_NAME, session.secret, {
+    setCookie(c, AUTH_COOKIE, session.secret, {
       path: '/',
       httpOnly: true,
       secure: true,
@@ -59,7 +59,7 @@ const app = new Hono()
   .post('/sign-out', sessionMiddleware, async (c) => {
     const account = c.get('account');
 
-    deleteCookie(c, AUTH_COOKIE_NAME);
+    deleteCookie(c, AUTH_COOKIE);
 
     await account.deleteSession({ sessionId: 'current' });
 

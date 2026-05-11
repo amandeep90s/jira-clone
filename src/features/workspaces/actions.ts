@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 import { Account, Client, Query, TablesDB } from 'node-appwrite';
 
 import { DATABASE_ID, MEMBERS_TABLE_ID, WORKSPACES_TABLE_ID } from '@/config';
-import { AUTH_COOKIE_NAME } from '@/features/auth/constants';
+import { AUTH_COOKIE } from '@/features/auth/constants';
 import { getMember } from '@/features/members/utils';
 
 import { Workspace } from './types';
@@ -30,7 +30,7 @@ export const getWorkspaces = async () => {
 
   try {
     const client = new Client().setEndpoint(endpoint).setProject(project);
-    const session = (await cookies()).get(AUTH_COOKIE_NAME);
+    const session = (await cookies()).get(AUTH_COOKIE);
 
     if (!session) {
       return emptyResponse;
@@ -82,7 +82,7 @@ export const getWorkspace = async ({ workspaceId }: GetWorkspaceProps): Promise<
 
   try {
     const client = new Client().setEndpoint(endpoint).setProject(project);
-    const session = (await cookies()).get(AUTH_COOKIE_NAME);
+    const session = (await cookies()).get(AUTH_COOKIE);
 
     if (!session) {
       return emptyResponse;

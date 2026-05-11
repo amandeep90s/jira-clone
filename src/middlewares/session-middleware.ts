@@ -17,7 +17,7 @@ import {
 } from 'node-appwrite';
 
 import { APPWRITE_ENDPOINT, APPWRITE_PROJECT } from '@/config';
-import { AUTH_COOKIE_NAME } from '@/features/auth/constants';
+import { AUTH_COOKIE } from '@/features/auth/constants';
 
 type AdditionalContext = {
   Variables: {
@@ -33,7 +33,7 @@ type AdditionalContext = {
 export const sessionMiddleware = createMiddleware<AdditionalContext>(async (c, next) => {
   const client = new Client().setEndpoint(APPWRITE_ENDPOINT).setProject(APPWRITE_PROJECT);
 
-  const session = getCookie(c, AUTH_COOKIE_NAME);
+  const session = getCookie(c, AUTH_COOKIE);
 
   if (!session) {
     return c.json({ message: 'Unauthorized' }, 401);

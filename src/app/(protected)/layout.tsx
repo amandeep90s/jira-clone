@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 
-import { getUser } from '@/features/auth/actions';
+import { getUser } from '@/features/auth/queries';
 
 interface ProtectedLayoutProps {
   children: React.ReactNode;

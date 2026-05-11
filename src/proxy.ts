@@ -1,14 +1,14 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import { AUTH_COOKIE_NAME } from '@/features/auth/constants';
+import { AUTH_COOKIE } from '@/features/auth/constants';
 
 // Routes accessible without authentication
 const PUBLIC_ROUTES = ['/sign-in', '/sign-up', '/privacy', '/terms'];
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const isAuthenticated = request.cookies.has(AUTH_COOKIE_NAME);
+  const isAuthenticated = request.cookies.has(AUTH_COOKIE);
 
   // Check if current route is public
   const isPublicRoute = PUBLIC_ROUTES.some((route) => pathname === route || pathname.startsWith(route + '/'));
