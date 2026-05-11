@@ -113,6 +113,32 @@ const app = new Hono()
     });
 
     return c.json({ data: updatedWorkspace });
+  })
+  .delete('/:workspaceId', sessionMiddleware, async (c) => {
+    const tablesDB = c.get('tablesDB');
+    const user = c.get('user');
+
+    const { workspaceId } = c.req.param();
+
+    const member = await getMember({ tablesDB, userId: user.$id, workspaceId });
+
+    if (!member) {
+      return c.json({ error: 'Workspace not found' }, 404);
+    }
+
+    if (member.role !== MemberRole.ADMIN) {
+      return c.json({ error: 'Only admins can delete the workspace' }, 403);
+    }
+
+    // TODO: Delete members, projects and tasks related to this workspace
+
+    await tablesDB.deleteRow({
+      databaseId: DATABASE_ID,
+      tableId: WORKSPACES_TABLE_ID,
+      rowId: workspaceId,
+    });
+
+    return c.json({ data: { $id: workspaceId, message: 'Workspace deleted successfully' } });
   });
 
 export default app;

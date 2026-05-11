@@ -15,9 +15,11 @@ import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/c
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
+import { useDeleteWorkspace } from '@/features/workspaces/api/use-delete-workspace';
 import { useUpdateWorkspace } from '@/features/workspaces/api/use-update-workspace';
 import { UpdateWorkspaceFormData, updateWorkspaceSchema } from '@/features/workspaces/schemas';
 import { Workspace } from '@/features/workspaces/types';
+import { useConfirm } from '@/hooks/use-confirm';
 import { cn } from '@/lib/utils';
 
 interface EditWorkspaceFormProps {
@@ -27,10 +29,14 @@ interface EditWorkspaceFormProps {
 
 export const EditWorkspaceForm = ({ initialValues, onCancel }: EditWorkspaceFormProps) => {
   const router = useRouter();
-  console.log(initialValues);
   const { mutate, isPending } = useUpdateWorkspace();
+  const { mutate: deleteWorkspace, isPending: isDeleting } = useDeleteWorkspace();
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(initialValues.imageUrl ?? null);
   const [fileInputKey, setFileInputKey] = useState(0);
+  const [DeleteDialog, confirmDelete] = useConfirm(
+    'Delete Workspace',
+    'Are you sure you want to delete this workspace? This action cannot be undone.',
+  );
 
   // Revoke the blob URL whenever the preview URL changes or on unmount
   useEffect(() => {
@@ -58,6 +64,25 @@ export const EditWorkspaceForm = ({ initialValues, onCancel }: EditWorkspaceForm
     resetImageInput();
     if (onCancel) onCancel();
   }, [onCancel, form]);
+
+  const handleDelete = async () => {
+    const ok = await confirmDelete();
+
+    if (!ok) return;
+
+    deleteWorkspace(
+      {
+        param: { workspaceId: initialValues.$id },
+      },
+      {
+        onSuccess: () => {
+          router.push('/');
+          toast.success('Workspace deleted successfully!');
+        },
+        onError: () => toast.error('Failed to delete workspace. Please try again.'),
+      },
+    );
+  };
 
   const onSubmit = useCallback(
     (formData: UpdateWorkspaceFormData) => {
@@ -88,123 +113,150 @@ export const EditWorkspaceForm = ({ initialValues, onCancel }: EditWorkspaceForm
   }
 
   return (
-    <Card className="h-full w-full">
-      <CardHeader className="flex flex-row items-center space-y-0 gap-x-4">
-        <Button
-          size="sm"
-          variant={'secondary'}
-          onClick={onCancel ? onCancel : () => router.push(`/workspaces/${initialValues.$id}`)}
-        >
-          <ArrowLeftIcon size={5} />
-          Back
-        </Button>
-        <CardTitle className="text-xl font-bold">Edit {initialValues.name}</CardTitle>
-      </CardHeader>
-
-      <div className="px-6">
-        <Separator />
-      </div>
-
-      <CardContent className="px-6">
-        <form id="create-workspace-form" onSubmit={form.handleSubmit(onSubmit)}>
-          <FieldGroup className="">
-            <Controller
-              name="name"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel>
-                    Workspace Name <span className="text-destructive">*</span>
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    type="text"
-                    id={field.name}
-                    aria-invalid={fieldState.invalid}
-                    placeholder="Enter workspace name"
-                    autoComplete="off"
-                    disabled={form.formState.isSubmitting || isPending}
-                  />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-
-            <Controller
-              name="image"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel>Workspace Image</FieldLabel>
-                  <Input
-                    key={fileInputKey}
-                    name={field.name}
-                    onBlur={field.onBlur}
-                    disabled={form.formState.isSubmitting || isPending}
-                    accept="image/jpeg,image/png,image/svg+xml"
-                    id="image"
-                    type="file"
-                    onChange={handleImageChange}
-                  />
-                  <FieldDescription>
-                    Upload an image to represent your workspace. Supported formats: JPG, PNG, SVG or JPEG. Max size:
-                    1MB.
-                  </FieldDescription>
-
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-
-                  {imagePreviewUrl ? (
-                    <div className="flex w-fit flex-row items-end gap-4">
-                      <div className="relative size-18 overflow-hidden rounded-md border border-neutral-200">
-                        <Image src={imagePreviewUrl} alt="Workspace Image" fill className="object-cover" />
-                      </div>
-                      <Button
-                        size={'sm'}
-                        title="Remove Image"
-                        onClick={() => {
-                          field.onChange(undefined);
-                          resetImageInput();
-                        }}
-                        variant={'destructive'}
-                      >
-                        <Trash2Icon />
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="w-fit">
-                      <Avatar className="size-18 flex-0 overflow-hidden rounded-md">
-                        <AvatarFallback>
-                          <ImageIcon className="size-9 text-neutral-400 dark:text-neutral-200" />
-                        </AvatarFallback>
-                      </Avatar>
-                    </div>
-                  )}
-                </Field>
-              )}
-            />
-          </FieldGroup>
-        </form>
-      </CardContent>
-
-      <CardFooter className="flex-col">
-        <Field orientation="horizontal" className="justify-end gap-2">
-          <Button type="submit" form="create-workspace-form" disabled={form.formState.isSubmitting || isPending}>
-            {(form.formState.isSubmitting || isPending) && <Spinner data-icon="inline-start" />}
-
-            {form.formState.isSubmitting || isPending ? 'Saving...' : 'Save Changes'}
-          </Button>
-
+    <div className="flex flex-col gap-y-4">
+      <Card className="h-full w-full">
+        <CardHeader className="flex flex-row items-center space-y-0 gap-x-4">
           <Button
-            type="button"
-            variant={'outline'}
-            onClick={handleCancel}
-            disabled={form.formState.isSubmitting || isPending}
-            className={cn(Boolean(onCancel) ? 'block' : 'hidden')}
+            size="sm"
+            variant={'secondary'}
+            onClick={onCancel ? onCancel : () => router.push(`/workspaces/${initialValues.$id}`)}
           >
-            Cancel
+            <ArrowLeftIcon size={5} />
+            Back
           </Button>
-        </Field>
-      </CardFooter>
-    </Card>
+          <CardTitle className="text-xl font-bold">Edit {initialValues.name}</CardTitle>
+        </CardHeader>
+
+        <div className="px-6">
+          <Separator />
+        </div>
+
+        <CardContent className="px-6">
+          <form id="create-workspace-form" onSubmit={form.handleSubmit(onSubmit)}>
+            <FieldGroup className="">
+              <Controller
+                name="name"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel>
+                      Workspace Name <span className="text-destructive">*</span>
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      type="text"
+                      id={field.name}
+                      aria-invalid={fieldState.invalid}
+                      placeholder="Enter workspace name"
+                      autoComplete="off"
+                      disabled={form.formState.isSubmitting || isPending}
+                    />
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+                )}
+              />
+
+              <Controller
+                name="image"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel>Workspace Image</FieldLabel>
+                    <Input
+                      key={fileInputKey}
+                      name={field.name}
+                      onBlur={field.onBlur}
+                      disabled={form.formState.isSubmitting || isPending}
+                      accept="image/jpeg,image/png,image/svg+xml"
+                      id="image"
+                      type="file"
+                      onChange={handleImageChange}
+                    />
+                    <FieldDescription>
+                      Upload an image to represent your workspace. Supported formats: JPG, PNG, SVG or JPEG. Max size:
+                      1MB.
+                    </FieldDescription>
+
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+
+                    {imagePreviewUrl ? (
+                      <div className="flex w-fit flex-row items-end gap-4">
+                        <div className="relative size-18 overflow-hidden rounded-md border border-neutral-200">
+                          <Image src={imagePreviewUrl} alt="Workspace Image" fill className="object-cover" />
+                        </div>
+                        <Button
+                          size={'sm'}
+                          title="Remove Image"
+                          onClick={() => {
+                            field.onChange(undefined);
+                            resetImageInput();
+                          }}
+                          variant={'destructive'}
+                        >
+                          <Trash2Icon />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="w-fit">
+                        <Avatar className="size-18 flex-0 overflow-hidden rounded-md">
+                          <AvatarFallback>
+                            <ImageIcon className="size-9 text-neutral-400 dark:text-neutral-200" />
+                          </AvatarFallback>
+                        </Avatar>
+                      </div>
+                    )}
+                  </Field>
+                )}
+              />
+            </FieldGroup>
+          </form>
+        </CardContent>
+
+        <CardFooter className="flex-col">
+          <Field orientation="horizontal" className="justify-end gap-2">
+            <Button type="submit" form="create-workspace-form" disabled={form.formState.isSubmitting || isPending}>
+              {(form.formState.isSubmitting || isPending) && <Spinner data-icon="inline-start" />}
+
+              {form.formState.isSubmitting || isPending ? 'Saving...' : 'Save Changes'}
+            </Button>
+
+            <Button
+              type="button"
+              variant={'outline'}
+              onClick={handleCancel}
+              disabled={form.formState.isSubmitting || isPending}
+              className={cn(Boolean(onCancel) ? 'block' : 'hidden')}
+            >
+              Cancel
+            </Button>
+          </Field>
+        </CardFooter>
+      </Card>
+
+      <Card className="h-full w-full border-none shadow-none">
+        <CardContent className="px-6">
+          <div className="flex flex-col gap-y-4">
+            <div>
+              <h3 className="font-bold">Danger Zone</h3>
+              <p className="text-muted-foreground text-sm">
+                Deleting a workspace is irreversible. Please proceed with caution. Make sure to back up any important
+                data before deleting your workspace.
+              </p>
+            </div>
+            <Button
+              className="ml-auto w-fit"
+              variant="destructive"
+              disabled={isPending}
+              type="button"
+              onClick={handleDelete}
+            >
+              Delete Workspace
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <DeleteDialog />
+    </div>
   );
 };
