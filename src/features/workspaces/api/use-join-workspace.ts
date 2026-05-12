@@ -19,7 +19,8 @@ export const useJoinWorkspace = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to join workspace. Please try again.');
+        const errorData = (await response.json()) as { error?: string };
+        throw new Error(errorData.error ?? 'Failed to join workspace. Please try again.');
       }
 
       return response.json();

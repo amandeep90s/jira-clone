@@ -90,7 +90,7 @@ export const EditWorkspaceForm = ({ initialValues, onCancel }: EditWorkspaceForm
           router.push('/');
           toast.success('Workspace deleted successfully!');
         },
-        onError: () => toast.error('Failed to delete workspace. Please try again.'),
+        onError: (error) => toast.error(error.message),
       },
     );
   };
@@ -109,7 +109,7 @@ export const EditWorkspaceForm = ({ initialValues, onCancel }: EditWorkspaceForm
           toast.success('Invite code reset successfully!');
           router.refresh();
         },
-        onError: () => toast.error('Failed to reset invite code. Please try again.'),
+        onError: (error) => toast.error(error.message),
       },
     );
   };
@@ -124,7 +124,7 @@ export const EditWorkspaceForm = ({ initialValues, onCancel }: EditWorkspaceForm
             router.push(`/workspaces/${data.$id}`);
             toast.success('Workspace updated successfully!');
           },
-          onError: () => toast.error('Failed to update workspace. Please try again.'),
+          onError: (error) => toast.error(error.message),
         },
       );
     },

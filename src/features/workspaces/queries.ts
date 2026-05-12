@@ -81,3 +81,33 @@ export const getWorkspace = async ({ workspaceId }: GetWorkspaceProps): Promise<
     return emptyResponse;
   }
 };
+
+interface GetWorkspaceInfoProps {
+  workspaceId: string;
+}
+
+/**
+ * Get a workspace by its ID, ensuring that the currently authenticated user is a member of that workspace.
+ * @param param0 An object containing the workspaceId.
+ * @returns The workspace if the user is a member, or an empty response if not.
+ */
+export const getWorkspaceInfo = async ({ workspaceId }: GetWorkspaceInfoProps): Promise<{ name: string } | null> => {
+  const emptyResponse = null;
+
+  try {
+    const session = await createSessionClient();
+    if (!session) return null;
+
+    const tablesDB = session.tables;
+
+    const workspace = await tablesDB.getRow({
+      databaseId: DATABASE_ID,
+      tableId: WORKSPACES_TABLE_ID,
+      rowId: workspaceId,
+    });
+
+    return { name: workspace.name };
+  } catch {
+    return emptyResponse;
+  }
+};

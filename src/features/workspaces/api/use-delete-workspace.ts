@@ -18,7 +18,8 @@ export const useDeleteWorkspace = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to delete workspace. Please try again.');
+        const errorData = (await response.json()) as { error?: string };
+        throw new Error(errorData.error ?? 'Failed to delete workspace. Please try again.');
       }
 
       return response.json();

@@ -62,7 +62,7 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
           router.push(`/workspaces/${data.$id}`);
           toast.success('Workspace created successfully!');
         },
-        onError: () => toast.error('Failed to create workspace. Please try again.'),
+        onError: (error) => toast.error(error.message),
       });
     },
     [mutate, router],

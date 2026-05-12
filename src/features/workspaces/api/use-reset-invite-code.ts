@@ -21,7 +21,8 @@ export const useResetInviteCode = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to reset invite code. Please try again.');
+        const errorData = (await response.json()) as { error?: string };
+        throw new Error(errorData.error ?? 'Failed to reset invite code. Please try again.');
       }
 
       return response.json();

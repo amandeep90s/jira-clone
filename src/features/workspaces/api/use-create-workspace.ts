@@ -23,7 +23,8 @@ export const useCreateWorkspace = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create workspace. Please try again.');
+        const errorData = (await response.json()) as { error?: string };
+        throw new Error(errorData.error ?? 'Failed to create workspace. Please try again.');
       }
 
       return response.json();
