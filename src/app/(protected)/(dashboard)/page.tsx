@@ -10,7 +10,7 @@ export default async function Home() {
 
   const workspaces = await getWorkspaces();
 
-  if (workspaces.total === 0) {
+  if (!workspaces || workspaces.total === 0) {
     redirect('/workspaces/create');
   } else {
     redirect(`/workspaces/${workspaces.rows[0].$id}`);
