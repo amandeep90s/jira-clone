@@ -2,7 +2,7 @@ import 'server-only';
 
 import { Query } from 'node-appwrite';
 
-import { DATABASE_ID, MEMBERS_TABLE_ID, WORKSPACES_TABLE_ID } from '@/config';
+import { ARRWRITE_DATABASE_ID, ARRWRITE_MEMBERS_TABLE_ID, ARRWRITE_WORKSPACES_TABLE_ID } from '@/config';
 import { getMember } from '@/features/members/utils';
 import { Workspace } from '@/features/workspaces/types';
 import { createSessionClient } from '@/lib/appwrite';
@@ -22,8 +22,8 @@ export const getWorkspaces = async () => {
     const user = await session.account.get();
 
     const members = await tablesDB.listRows({
-      databaseId: DATABASE_ID,
-      tableId: MEMBERS_TABLE_ID,
+      databaseId: ARRWRITE_DATABASE_ID,
+      tableId: ARRWRITE_MEMBERS_TABLE_ID,
       queries: [Query.equal('userId', user.$id)],
     });
 
@@ -34,8 +34,8 @@ export const getWorkspaces = async () => {
     const workspaceIds = members.rows.map((member) => member.workspaceId);
 
     const workspaces = await tablesDB.listRows({
-      databaseId: DATABASE_ID,
-      tableId: WORKSPACES_TABLE_ID,
+      databaseId: ARRWRITE_DATABASE_ID,
+      tableId: ARRWRITE_WORKSPACES_TABLE_ID,
       queries: [Query.contains('$id', workspaceIds), Query.orderDesc('$createdAt')],
     });
 
@@ -71,8 +71,8 @@ export const getWorkspace = async ({ workspaceId }: GetWorkspaceProps): Promise<
     }
 
     const workspace = await tablesDB.listRows({
-      databaseId: DATABASE_ID,
-      tableId: WORKSPACES_TABLE_ID,
+      databaseId: ARRWRITE_DATABASE_ID,
+      tableId: ARRWRITE_WORKSPACES_TABLE_ID,
       queries: [Query.equal('$id', workspaceId)],
     });
 
@@ -101,8 +101,8 @@ export const getWorkspaceInfo = async ({ workspaceId }: GetWorkspaceInfoProps): 
     const tablesDB = session.tables;
 
     const workspace = await tablesDB.getRow({
-      databaseId: DATABASE_ID,
-      tableId: WORKSPACES_TABLE_ID,
+      databaseId: ARRWRITE_DATABASE_ID,
+      tableId: ARRWRITE_WORKSPACES_TABLE_ID,
       rowId: workspaceId,
     });
 

@@ -2,7 +2,12 @@ import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { ID, Permission, Query, Role } from 'node-appwrite';
 
-import { DATABASE_ID, MEMBERS_TABLE_ID, STORAGE_BUCKET_ID, WORKSPACES_TABLE_ID } from '@/config';
+import {
+  ARRWRITE_DATABASE_ID,
+  ARRWRITE_MEMBERS_TABLE_ID,
+  ARRWRITE_WORKSPACES_TABLE_ID,
+  STORAGE_BUCKET_ID,
+} from '@/config';
 import { MemberRole } from '@/features/members/types';
 import { getMember } from '@/features/members/utils';
 import { createWorkspaceSchema, updateWorkspaceSchema, workspaceJoinCodeSchema } from '@/features/workspaces/schemas';
@@ -15,8 +20,8 @@ const app = new Hono()
     const tablesDB = c.get('tablesDB');
 
     const members = await tablesDB.listRows({
-      databaseId: DATABASE_ID,
-      tableId: MEMBERS_TABLE_ID,
+      databaseId: ARRWRITE_DATABASE_ID,
+      tableId: ARRWRITE_MEMBERS_TABLE_ID,
       queries: [Query.equal('userId', user.$id)],
     });
 
@@ -27,8 +32,8 @@ const app = new Hono()
     const workspaceIds = members.rows.map((member) => member.workspaceId);
 
     const workspaces = await tablesDB.listRows({
-      databaseId: DATABASE_ID,
-      tableId: WORKSPACES_TABLE_ID,
+      databaseId: ARRWRITE_DATABASE_ID,
+      tableId: ARRWRITE_WORKSPACES_TABLE_ID,
       queries: [Query.contains('$id', workspaceIds), Query.orderDesc('$createdAt')],
     });
 
@@ -54,8 +59,8 @@ const app = new Hono()
     const inviteCode = generateInviteCode();
 
     const workspace = await tablesDB.createRow({
-      databaseId: DATABASE_ID,
-      tableId: WORKSPACES_TABLE_ID,
+      databaseId: ARRWRITE_DATABASE_ID,
+      tableId: ARRWRITE_WORKSPACES_TABLE_ID,
       rowId: ID.unique(),
       data: { name, userId: user.$id, imageUrl: uploadedImageUrl, inviteCode },
       permissions: [
@@ -66,8 +71,8 @@ const app = new Hono()
     });
 
     await tablesDB.createRow({
-      databaseId: DATABASE_ID,
-      tableId: MEMBERS_TABLE_ID,
+      databaseId: ARRWRITE_DATABASE_ID,
+      tableId: ARRWRITE_MEMBERS_TABLE_ID,
       rowId: ID.unique(),
       data: { workspaceId: workspace.$id, userId: user.$id, role: MemberRole.ADMIN },
     });
@@ -105,8 +110,8 @@ const app = new Hono()
     }
 
     const updatedWorkspace = await tablesDB.updateRow({
-      databaseId: DATABASE_ID,
-      tableId: WORKSPACES_TABLE_ID,
+      databaseId: ARRWRITE_DATABASE_ID,
+      tableId: ARRWRITE_WORKSPACES_TABLE_ID,
       rowId: workspaceId,
       data: { name, imageUrl: uploadedImageUrl },
     });
@@ -132,8 +137,8 @@ const app = new Hono()
     // TODO: Delete members, projects and tasks related to this workspace
 
     await tablesDB.deleteRow({
-      databaseId: DATABASE_ID,
-      tableId: WORKSPACES_TABLE_ID,
+      databaseId: ARRWRITE_DATABASE_ID,
+      tableId: ARRWRITE_WORKSPACES_TABLE_ID,
       rowId: workspaceId,
     });
 
@@ -156,8 +161,8 @@ const app = new Hono()
     }
 
     const workspace = await tablesDB.updateRow({
-      databaseId: DATABASE_ID,
-      tableId: WORKSPACES_TABLE_ID,
+      databaseId: ARRWRITE_DATABASE_ID,
+      tableId: ARRWRITE_WORKSPACES_TABLE_ID,
       rowId: workspaceId,
       data: { inviteCode: generateInviteCode() },
     });
@@ -178,8 +183,8 @@ const app = new Hono()
     }
 
     const workspace = await tablesDB.getRow({
-      databaseId: DATABASE_ID,
-      tableId: WORKSPACES_TABLE_ID,
+      databaseId: ARRWRITE_DATABASE_ID,
+      tableId: ARRWRITE_WORKSPACES_TABLE_ID,
       rowId: workspaceId,
     });
 
@@ -192,8 +197,8 @@ const app = new Hono()
     }
 
     await tablesDB.createRow({
-      databaseId: DATABASE_ID,
-      tableId: MEMBERS_TABLE_ID,
+      databaseId: ARRWRITE_DATABASE_ID,
+      tableId: ARRWRITE_MEMBERS_TABLE_ID,
       rowId: ID.unique(),
       data: { workspaceId, userId: user.$id, role: MemberRole.MEMBER },
     });

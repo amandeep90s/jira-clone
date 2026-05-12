@@ -1,6 +1,6 @@
 import { Query, TablesDB } from 'node-appwrite';
 
-import { DATABASE_ID, MEMBERS_TABLE_ID } from '@/config';
+import { ARRWRITE_DATABASE_ID, ARRWRITE_MEMBERS_TABLE_ID } from '@/config';
 
 interface GetMemberProps {
   tablesDB: TablesDB;
@@ -15,8 +15,8 @@ interface GetMemberProps {
  */
 export async function getMember({ tablesDB, userId, workspaceId }: GetMemberProps) {
   const members = await tablesDB.listRows({
-    databaseId: DATABASE_ID,
-    tableId: MEMBERS_TABLE_ID,
+    databaseId: ARRWRITE_DATABASE_ID,
+    tableId: ARRWRITE_MEMBERS_TABLE_ID,
     queries: [Query.equal('userId', userId), Query.equal('workspaceId', workspaceId)],
   });
 
