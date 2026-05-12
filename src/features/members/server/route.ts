@@ -2,7 +2,7 @@ import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { Query } from 'node-appwrite';
 
-import { ARRWRITE_DATABASE_ID, ARRWRITE_MEMBERS_TABLE_ID } from '@/config';
+import { APPWRITE_DATABASE_ID, APPWRITE_MEMBERS_TABLE_ID } from '@/config';
 import { getMembersSchema, updateMemberRoleSchema } from '@/features/members/schemas';
 import { getMember } from '@/features/members/utils';
 import { createAdminClient } from '@/lib/appwrite';
@@ -24,8 +24,8 @@ const app = new Hono()
     }
 
     const members = await tablesDB.listRows({
-      databaseId: ARRWRITE_DATABASE_ID,
-      tableId: ARRWRITE_MEMBERS_TABLE_ID,
+      databaseId: APPWRITE_DATABASE_ID,
+      tableId: APPWRITE_MEMBERS_TABLE_ID,
       queries: [Query.equal('workspaceId', workspaceId)],
     });
 
@@ -54,8 +54,8 @@ const app = new Hono()
     const user = c.get('user');
 
     const memberToDelete = await tablesDB.getRow({
-      databaseId: ARRWRITE_DATABASE_ID,
-      tableId: ARRWRITE_MEMBERS_TABLE_ID,
+      databaseId: APPWRITE_DATABASE_ID,
+      tableId: APPWRITE_MEMBERS_TABLE_ID,
       rowId: memberId,
     });
 
@@ -64,8 +64,8 @@ const app = new Hono()
     }
 
     const allMembersInWorkspace = await tablesDB.listRows({
-      databaseId: ARRWRITE_DATABASE_ID,
-      tableId: ARRWRITE_MEMBERS_TABLE_ID,
+      databaseId: APPWRITE_DATABASE_ID,
+      tableId: APPWRITE_MEMBERS_TABLE_ID,
       queries: [Query.equal('workspaceId', memberToDelete.workspaceId)],
     });
 
@@ -84,8 +84,8 @@ const app = new Hono()
     }
 
     await tablesDB.deleteRow({
-      databaseId: ARRWRITE_DATABASE_ID,
-      tableId: ARRWRITE_MEMBERS_TABLE_ID,
+      databaseId: APPWRITE_DATABASE_ID,
+      tableId: APPWRITE_MEMBERS_TABLE_ID,
       rowId: memberId,
     });
 
@@ -98,8 +98,8 @@ const app = new Hono()
     const { role } = c.req.valid('json');
 
     const memberToUpdate = await tablesDB.getRow({
-      databaseId: ARRWRITE_DATABASE_ID,
-      tableId: ARRWRITE_MEMBERS_TABLE_ID,
+      databaseId: APPWRITE_DATABASE_ID,
+      tableId: APPWRITE_MEMBERS_TABLE_ID,
       rowId: memberId,
     });
 
@@ -108,8 +108,8 @@ const app = new Hono()
     }
 
     const allMembersInWorkspace = await tablesDB.listRows({
-      databaseId: ARRWRITE_DATABASE_ID,
-      tableId: ARRWRITE_MEMBERS_TABLE_ID,
+      databaseId: APPWRITE_DATABASE_ID,
+      tableId: APPWRITE_MEMBERS_TABLE_ID,
       queries: [Query.equal('workspaceId', memberToUpdate.workspaceId)],
     });
 
@@ -128,8 +128,8 @@ const app = new Hono()
     }
 
     await tablesDB.updateRow({
-      databaseId: ARRWRITE_DATABASE_ID,
-      tableId: ARRWRITE_MEMBERS_TABLE_ID,
+      databaseId: APPWRITE_DATABASE_ID,
+      tableId: APPWRITE_MEMBERS_TABLE_ID,
       rowId: memberId,
       data: { role },
     });

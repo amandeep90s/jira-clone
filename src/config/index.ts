@@ -1,7 +1,7 @@
-export const ARRWRITE_DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID as string;
-export const ARRWRITE_WORKSPACES_TABLE_ID = process.env.NEXT_PUBLIC_APPWRITE_WORKSPACES_ID as string;
-export const ARRWRITE_MEMBERS_TABLE_ID = process.env.NEXT_PUBLIC_APPWRITE_MEMBERS_ID as string;
-export const ARRWRITE_PROJECTS_TABLE_ID = process.env.NEXT_PUBLIC_APPWRITE_PROJECTS_ID as string;
+export const APPWRITE_DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID as string;
+export const APPWRITE_WORKSPACES_TABLE_ID = process.env.NEXT_PUBLIC_APPWRITE_WORKSPACES_ID as string;
+export const APPWRITE_MEMBERS_TABLE_ID = process.env.NEXT_PUBLIC_APPWRITE_MEMBERS_ID as string;
+export const APPWRITE_PROJECTS_TABLE_ID = process.env.NEXT_PUBLIC_APPWRITE_PROJECTS_ID as string;
 export const APPWRITE_ENDPOINT = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT as string;
 export const APPWRITE_PROJECT = process.env.NEXT_PUBLIC_APPWRITE_PROJECT as string;
 export const APPWRITE_KEY = process.env.NEXT_APPWRITE_KEY as string;
