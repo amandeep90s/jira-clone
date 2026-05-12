@@ -18,6 +18,11 @@ export const createWorkspaceSchema = schema;
 
 export const updateWorkspaceSchema = schema.partial();
 
+export const workspaceJoinCodeSchema = z.object({
+  inviteCode: z.string().trim().min(1, 'Invite code is required'),
+});
+
 // Export the inferred TypeScript type for the create workspace data
 export type CreateWorkspaceFormData = z.infer<typeof createWorkspaceSchema>;
 export type UpdateWorkspaceFormData = z.infer<typeof updateWorkspaceSchema>;
+export type WorkspaceJoinCodeData = z.infer<typeof workspaceJoinCodeSchema>;

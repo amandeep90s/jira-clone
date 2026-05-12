@@ -5,10 +5,9 @@ import { ID, Permission, Query, Role } from 'node-appwrite';
 import { DATABASE_ID, MEMBERS_TABLE_ID, STORAGE_BUCKET_ID, WORKSPACES_TABLE_ID } from '@/config';
 import { MemberRole } from '@/features/members/types';
 import { getMember } from '@/features/members/utils';
+import { createWorkspaceSchema, updateWorkspaceSchema, workspaceJoinCodeSchema } from '@/features/workspaces/schemas';
 import { generateInviteCode } from '@/lib/utils';
 import { sessionMiddleware } from '@/middlewares/session-middleware';
-
-import { createWorkspaceSchema, updateWorkspaceSchema } from '../schemas';
 
 const app = new Hono()
   .get('/', sessionMiddleware, async (c) => {
@@ -164,6 +163,42 @@ const app = new Hono()
     });
 
     return c.json({ data: workspace, message: 'Workspace invite code reset successfully' });
+  })
+  .post('/:workspaceId/join', zValidator('json', workspaceJoinCodeSchema), sessionMiddleware, async (c) => {
+    const tablesDB = c.get('tablesDB');
+    const user = c.get('user');
+
+    const { workspaceId } = c.req.param();
+    const { inviteCode } = c.req.valid('json');
+
+    const existingMember = await getMember({ tablesDB, userId: user.$id, workspaceId });
+
+    if (existingMember) {
+      return c.json({ error: 'User is already a member of this workspace' }, 400);
+    }
+
+    const workspace = await tablesDB.getRow({
+      databaseId: DATABASE_ID,
+      tableId: WORKSPACES_TABLE_ID,
+      rowId: workspaceId,
+    });
+
+    if (!workspace) {
+      return c.json({ error: 'Workspace not found' }, 404);
+    }
+
+    if (workspace.inviteCode !== inviteCode) {
+      return c.json({ error: 'Invalid invite code' }, 400);
+    }
+
+    await tablesDB.createRow({
+      databaseId: DATABASE_ID,
+      tableId: MEMBERS_TABLE_ID,
+      rowId: ID.unique(),
+      data: { workspaceId, userId: user.$id, role: MemberRole.MEMBER },
+    });
+
+    return c.json({ data: workspace, message: 'Joined workspace successfully' });
   });
 
 export default app;
