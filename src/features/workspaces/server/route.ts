@@ -139,6 +139,31 @@ const app = new Hono()
     });
 
     return c.json({ data: { $id: workspaceId, message: 'Workspace deleted successfully' } });
+  })
+  .post('/:workspaceId/reset-invite-code', sessionMiddleware, async (c) => {
+    const tablesDB = c.get('tablesDB');
+    const user = c.get('user');
+
+    const { workspaceId } = c.req.param();
+
+    const member = await getMember({ tablesDB, userId: user.$id, workspaceId });
+
+    if (!member) {
+      return c.json({ error: 'Workspace not found' }, 404);
+    }
+
+    if (member.role !== MemberRole.ADMIN) {
+      return c.json({ error: 'Only admins can reset the invite code' }, 403);
+    }
+
+    const workspace = await tablesDB.updateRow({
+      databaseId: DATABASE_ID,
+      tableId: WORKSPACES_TABLE_ID,
+      rowId: workspaceId,
+      data: { inviteCode: generateInviteCode() },
+    });
+
+    return c.json({ data: workspace, message: 'Workspace invite code reset successfully' });
   });
 
 export default app;
