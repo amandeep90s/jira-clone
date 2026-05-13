@@ -3,22 +3,22 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { InferResponseType } from 'hono';
 
-import { CreateProjectSchema } from '@/features/projects/schemas';
+import { CreateProjectFormSchema } from '@/features/projects/schemas';
 import { client } from '@/lib/rpc';
 
-type ResponseType = InferResponseType<typeof client.api.projects.$post>;
+type ResponseType = InferResponseType<typeof client.api.projects.$post, 200>;
 
 export const useCreateProject = () => {
   const queryClient = useQueryClient();
 
-  const mutation = useMutation<ResponseType, Error, CreateProjectSchema>({
+  const mutation = useMutation<ResponseType, Error, CreateProjectFormSchema>({
     mutationFn: async (data) => {
       const response = await client.api.projects.$post({
         form: {
           name: data.name,
           workspaceId: data.workspaceId,
           ...(data.image instanceof File ? { image: data.image } : {}),
-        } as CreateProjectSchema,
+        } as CreateProjectFormSchema,
       });
 
       if (!response.ok) {

@@ -4,7 +4,7 @@ import { ID, Query } from 'node-appwrite';
 
 import { APPWRITE_DATABASE_ID, APPWRITE_PROJECTS_TABLE_ID, STORAGE_BUCKET_ID } from '@/config';
 import { getMember } from '@/features/members/utils';
-import { createProjectSchema, getProjectsSchema } from '@/features/projects/schemas';
+import { createProjectFormSchema, getProjectsSchema } from '@/features/projects/schemas';
 import { sessionMiddleware } from '@/middlewares/session-middleware';
 
 const app = new Hono()
@@ -28,7 +28,7 @@ const app = new Hono()
 
     return c.json({ data: projects });
   })
-  .post('/', sessionMiddleware, zValidator('form', createProjectSchema), async (c) => {
+  .post('/', sessionMiddleware, zValidator('form', createProjectFormSchema), async (c) => {
     const tablesDB = c.get('tablesDB');
     const user = c.get('user');
     const storage = c.get('storage');
