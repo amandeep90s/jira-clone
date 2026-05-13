@@ -4,12 +4,12 @@ import { LogOutIcon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { Navigation } from '@/components/navigation';
+import { Projects } from '@/components/projects';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import WorkspaceSwitcher from '@/components/workspace-switcher';
 import { useSignOut } from '@/features/auth/api/use-sign-out';
-
-import { Navigation } from './navigation';
-import { Button } from './ui/button';
-import { Separator } from './ui/separator';
-import WorkspaceSwitcher from './workspace-switcher';
 
 export function Sidebar() {
   const { mutate: signOut } = useSignOut();
@@ -44,6 +44,10 @@ export function Sidebar() {
           <Separator className="my-4" />
 
           <Navigation />
+
+          <Separator className="my-4" />
+
+          <Projects />
         </div>
         <Button
           variant={'outline'}

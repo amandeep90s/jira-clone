@@ -24,8 +24,7 @@ export const useUpdateWorkspace = () => {
         form: {
           name: form.name,
           ...(form.image instanceof File ? { image: form.image } : {}),
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any,
+        } as UpdateWorkspaceFormData,
       });
 
       if (!response.ok) {
