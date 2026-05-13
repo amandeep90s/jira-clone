@@ -5,6 +5,8 @@ import { usePathname } from 'next/navigation';
 import { RiAddCircleLine } from 'react-icons/ri';
 
 import { useGetProjects } from '@/features/projects/api/use-get-projects';
+import ProjectAvatar from '@/features/projects/components/project-avatar';
+import { useCreateProjectModal } from '@/features/projects/hooks/use-create-project-modal';
 import { useWorkspaceId } from '@/features/workspaces/hooks/use-workspace-id';
 import { cn } from '@/lib/utils';
 
@@ -14,6 +16,7 @@ export function Projects() {
   const workspaceId = useWorkspaceId();
   const { data: projects, isLoading } = useGetProjects({ workspaceId });
   const pathname = usePathname();
+  const { open } = useCreateProjectModal();
 
   if (isLoading) {
     return (
@@ -29,7 +32,7 @@ export function Projects() {
       <div className="flex items-center justify-between">
         <p className="text-xs font-semibold text-neutral-500 uppercase">Projects</p>
         <RiAddCircleLine
-          onClick={() => {}}
+          onClick={open}
           className="size-5 cursor-pointer text-neutral-500 transition hover:opacity-75"
         />
       </div>
@@ -48,6 +51,7 @@ export function Projects() {
                   : 'text-neutral-700 hover:bg-neutral-200 dark:text-neutral-300 dark:hover:bg-neutral-700',
               )}
             >
+              <ProjectAvatar name={project.name} image={project.imageUrl} className="size-6 shrink-0" />
               <span className="truncate">{project.name}</span>
             </div>
           </Link>

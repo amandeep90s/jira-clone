@@ -55,7 +55,7 @@ const app = new Hono()
       databaseId: APPWRITE_DATABASE_ID,
       tableId: APPWRITE_PROJECTS_TABLE_ID,
       rowId: ID.unique(),
-      data: { name, userId: user.$id, imageUrl: uploadedImageUrl, workspaceId },
+      data: { name, imageUrl: uploadedImageUrl, workspaceId },
     });
 
     return c.json({ data: project });

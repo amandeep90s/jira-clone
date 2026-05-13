@@ -15,11 +15,10 @@ import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/c
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
+import { useCreateProject } from '@/features/projects/hooks/use-create-project';
+import { CreateProjectFormSchema, createProjectFormSchema } from '@/features/projects/schemas';
 import { useWorkspaceId } from '@/features/workspaces/hooks/use-workspace-id';
 import { cn } from '@/lib/utils';
-
-import { CreateProjectFormSchema, createProjectFormSchema } from '../schemas';
-import { useCreateProject } from './use-create-project';
 
 interface CreateProjectFormProps {
   onCancel?: () => void;
@@ -44,6 +43,7 @@ export const CreateProjectForm = ({ onCancel }: CreateProjectFormProps) => {
     mode: 'onSubmit',
     defaultValues: {
       name: '',
+      workspaceId: workspaceId ?? '',
     },
   });
 

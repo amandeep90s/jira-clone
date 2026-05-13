@@ -12,15 +12,17 @@ interface WorkspaceAvatarProps {
 export default function WorkspaceAvatar({ image, name, className }: WorkspaceAvatarProps) {
   if (image) {
     return (
-      <div className={cn('size-10 overflow-hidden rounded-md', className)}>
-        <Image src={image} alt={name} className="object-cover" width={40} height={40} />
+      <div className={cn('relative size-10 overflow-hidden rounded-md border border-neutral-200', className)}>
+        <Image src={image} alt={name} fill className="object-cover" />
       </div>
     );
   }
 
   return (
     <Avatar className={cn('size-10 rounded-md', className)}>
-      <AvatarFallback className="text-foreground rounded-md text-sm font-semibold uppercase">{name[0]}</AvatarFallback>
+      <AvatarFallback className="text-foreground rounded-md border border-neutral-200 text-sm font-semibold uppercase">
+        {name[0]}
+      </AvatarFallback>
     </Avatar>
   );
 }
