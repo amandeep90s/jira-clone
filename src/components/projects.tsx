@@ -38,7 +38,7 @@ export function Projects() {
       </div>
 
       {projects?.rows.map((project) => {
-        const projectHref = `/workspaces/${workspaceId}/projects/${project.id}`;
+        const projectHref = `/workspaces/${workspaceId}/projects/${project.$id}`;
         const isActive = pathname === projectHref;
 
         return (
